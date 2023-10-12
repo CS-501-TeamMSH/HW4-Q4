@@ -21,13 +21,13 @@ import androidx.core.view.GestureDetectorCompat
 import kotlin.math.abs
 
 
-class MainActivity : AppCompatActivity(), SensorEventListener {
+class SouthActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_south)
         setupSensor()
     }
 
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             } else if (x < -threshold) {
                 openActivity(WestActivity::class.java)
             } else if (y > threshold) {
-                openActivity(SouthActivity::class.java)
+                openActivity(MainActivity::class.java)
             } else if (y < -threshold) {
                 openActivity(NorthActivity::class.java)
             }
