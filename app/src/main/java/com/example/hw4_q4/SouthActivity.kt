@@ -1,34 +1,27 @@
 package com.example.hw4_q4
 
-
-import android.content.Context
 import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.MotionEvent
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
-import androidx.core.view.GestureDetectorCompat
-import kotlin.math.abs
-
 
 class SouthActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
+    private var sensorRegistered = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_south)
-        setupSensor()
+
+        if (!sensorRegistered) {
+            setupSensor()
+            sensorRegistered = true
+        }
     }
 
     private fun setupSensor() {
@@ -37,7 +30,7 @@ class SouthActivity : AppCompatActivity(), SensorEventListener {
 
         if (accelerometer != null) {
             Log.e("Sensor", "Accelerometer available")
-            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST)
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI)
         } else {
             Log.e("Sensor", "Accelerometer not available")
         }
@@ -45,21 +38,22 @@ class SouthActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
-            val x = event.values[0]
-            val y = event.values[1]
+            val movementx = event.values[0]
+            val movementy = event.values[1]
+            val flingThreshold = 10
 
-            val threshold = 3.0
-
-            if (x > threshold) {
-                openActivity(EastActivity::class.java)
-            } else if (x < -threshold) {
-                openActivity(WestActivity::class.java)
-            } else if (y > threshold) {
+            if (movementy > flingThreshold) {
                 openActivity(MainActivity::class.java)
-            } else if (y < -threshold) {
-                openActivity(NorthActivity::class.java)
+            } else if (movementx > flingThreshold) {
+                openActivity(EastActivity::class.java)
+            } else if (movementx < -flingThreshold) {
+                openActivity(WestActivity::class.java)
             }
         }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        return
     }
 
     private fun openActivity(activityClass: Class<*>) {
@@ -68,14 +62,6 @@ class SouthActivity : AppCompatActivity(), SensorEventListener {
     }
 
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        return
-    }
-
-    override fun onDestroy() {
-        sensorManager.unregisterListener(this)
-        super.onDestroy()
-    }
 
 
 }
